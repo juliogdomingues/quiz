@@ -1,7 +1,6 @@
 import pytest
 from model import Question
 
-
 def test_create_question():
     question = Question(title='q1')
     assert question.id != None
@@ -93,3 +92,19 @@ def test_add_choice_with_empty_text_raises_exception():
     question = Question(title='Empty text')
     with pytest.raises(Exception):
         question.add_choice('', True)
+
+@pytest.fixture
+def question_with_choices():
+    question = Question(title='Fixture Q', points=5, max_selections=2)
+    question.add_choice('Choice One', True)
+    question.add_choice('Choice Two', False)
+    question.add_choice('Choice Three', True)
+    return question
+
+def test_fixture_question_has_choices(question_with_choices):
+    assert len(question_with_choices.choices) == 3
+
+def test_fixture_question_select_choices(question_with_choices):
+    correct_ids = [c.id for c in question_with_choices.choices if c.is_correct]
+    selected = question_with_choices.select_choices(correct_ids)
+    assert len(selected) == len(correct_ids)
